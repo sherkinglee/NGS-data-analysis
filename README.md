@@ -45,7 +45,7 @@
 
 1） motifs分析（MEME, Homer)
 
-2) RNA二级结构： RNAfold, RNAstructure
+2)RNA二级结构： RNAfold, RNAstructure
 
 3）蛋白质二级结构预测
 
