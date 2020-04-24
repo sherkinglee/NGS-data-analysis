@@ -11,40 +11,66 @@
 ## **框架**
 
 ### **前期数据的获取和质控到mapping**
+
 1） 上游数据的获取（GEO）数据的下载
+
 2） 数据的质控（fastqc等）
+
 3） adapter的去除
+
 4） 去除rRNA的污染
+
 5） mapping （hisat2, STAR, bowtie, bowtie2 等不同mapping软件， 单端和双端的差别）
 
 
 ### **拿到bam文件之后的数据分析**
+
 1）counts的计算，htseq-count， featureCounts等
+
 2）标准化方式：RPKM, RPM, TPM，DESeq2标准化
+
 3）数据的合并（R, bash, python)
+
 4）差异分析 （DESeq2, edgeR, limma, xtail)
 
 ### **拿到差异基因之后的数据分析，可视化和功能富集分析等**
+
 1） 火山图的绘制
+
 2） 热图的绘制
+
 3） GO和KEGG以及GSEA的数据分析
 
 ### **其他**
+
 1） motifs分析（MEME, Homer)
+
 2) RNA二级结构： RNAfold, RNAstructure
+
 3）蛋白质二级结构预测
+
 4）GC分析
+
 5）UTR获取
+
 6）保守性分析
 
 ---
+
 ### **这些基本的流程弄完之后，再按照项目来整理**
 
 1）RNA-seq数据分析流程
+
 2）小RNA数据分析流程（miRNA数据分析）
+
 3）Ribo-seq数据分析流程
+
 4）表观组数据分析流程（ATAC-seq，CHIP-seq,])
+
 5) CLIP数据分析流程
+
 6) 单细胞转录组数据分析流程
+
 7) 单细胞空间转库组数据分析流程
+
 8) miRNA的预测和targets的预测等
