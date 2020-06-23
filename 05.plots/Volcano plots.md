@@ -1,10 +1,10 @@
-﻿##**Volcano plot**
+﻿## **Volcano plot**
 
 
 
 火山图的绘制一般用于差异基因表达之后用于展示在某种条件下上下调的基因情况。关于火山图，几乎每个生信人员都会绘制，这里我一般用ggplot2进行绘制，当然也可以结合ggpubr, ggtheme等R package进行绘制。
 
-###**火山图： ggplot2**
+### **火山图： ggplot2**
 
 + 数据准备
 进行火山图绘制所需要的数据一般都是进行差异表达之后的数据，即DESeq2,limma, xtail等差异表达的输出文件，包括log2FC, pvalue, qvalue等值。大概数据类型如下：
@@ -122,7 +122,7 @@ p
 
 ![image_1ebgb72r21hc0h261c391n2j1l4vp.png-61.4kB][2]
 
-###**火山图： ggpuber+ggthemes**
+### **火山图： ggpuber+ggthemes**
 
 和直接用ggplot产生的图差不多
 
@@ -168,7 +168,7 @@ p
 ![image_1ebgcueaudt814s1cin1cok16t716.png-132.3kB][3]
 
 
-###**交互式火山图： ggplot2+plotly**
+### **交互式火山图： ggplot2+plotly**
 
 ```
 library(plotly)

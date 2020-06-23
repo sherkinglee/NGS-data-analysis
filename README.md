@@ -10,7 +10,7 @@
 
 ## **框架**
 
-### **前期数据的获取和质控到mapping**
+### **[前期数据的获取和质控到mapping](https://github.com/sherkinglee/NGS-data-analysis/blob/master/01.pre-processing/pre-processing.md)**
 
 1） 上游数据的获取（GEO）数据的下载
 
@@ -20,10 +20,10 @@
 
 4） 去除rRNA的污染
 
-5） mapping （hisat2, STAR, bowtie, bowtie2 等不同mapping软件， 单端和双端的差别）
+5） [mapping （hisat2, STAR, bowtie, bowtie2 等不同mapping软件， 单端和双端的差别）](https://github.com/sherkinglee/NGS-data-analysis/blob/master/01.pre-processing/Mapping.md)
 
 
-### **拿到bam文件之后的数据分析**
+### **[拿到bam文件之后的数据分析](https://github.com/sherkinglee/NGS-data-analysis/blob/master/02.differential-expressioin-analysis/DEAnalysis.md)**
 
 1）counts的计算，htseq-count， featureCounts等
 
@@ -33,21 +33,21 @@
 
 4）差异分析 （DESeq2, edgeR, limma, xtail)
 
-### **拿到差异基因之后的数据分析，可视化和功能富集分析等**
+### **[拿到差异基因之后的数据分析，可视化和功能富集分析等](https://github.com/sherkinglee/NGS-data-analysis/blob/master/02.differential-expressioin-analysis/visualization.md)**
 
 1） 火山图的绘制
 
 2） 热图的绘制
 
-3） GO和KEGG以及GSEA的数据分析
+3） [GO和KEGG以及GSEA的数据分析](https://github.com/sherkinglee/NGS-data-analysis/tree/master/03.functional-analysis)
 
-### **其他**
+### **[其他]()**
 
-1）motifs分析（MEME, Homer)
+1）[motifs分析（MEME, Homer)](https://github.com/sherkinglee/NGS-data-analysis/blob/master/04.sequence-features-analysis/motifs.md)
 
-2）RNA二级结构： RNAfold, RNAstructure
+2）[RNA二级结构： RNAfold, RNAstructure](https://github.com/sherkinglee/NGS-data-analysis/blob/master/04.sequence-features-analysis/RNASecondaryStructures.md)
 
-3）蛋白质二级结构预测
+3）[蛋白质二级结构预测](https://github.com/sherkinglee/NGS-data-analysis/blob/master/04.sequence-features-analysis/ProteinSecondaryStructures.md)
 
 4）GC分析
 

@@ -1,4 +1,4 @@
-﻿##**RNA secondary structures**
+﻿## **RNA secondary structures**
 
 这部分我也没有太多的经验，主要是用[RNAfold](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html)计算过5'UTR的最小自由能，统计过不同转录本形成二级结构可能性的metagene结果等等。
 

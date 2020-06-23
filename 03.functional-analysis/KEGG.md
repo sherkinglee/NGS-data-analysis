@@ -1,8 +1,8 @@
-﻿##**KEGG pathway analysis**
+﻿## **KEGG pathway analysis**
 
 KEGG分析在生物信息分析过程中也非常常见，目前有很多方法可以进行KEGG分析，包括使用[DAVID](https://david.ncifcrf.gov/), [Metascape](https://metascape.org/gp/index.html#/main/step1)以及[ClusterProfiler](https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html)等等。这里我们分别进行介绍。
 
-###**[DAVID基本使用](https://david.ncifcrf.gov/)**
+### **[DAVID基本使用](https://david.ncifcrf.gov/)**
 
 第一步：点击[Functional Annotation](https://david.ncifcrf.gov/summary.jsp)进入功能注释界面
 
@@ -34,7 +34,7 @@ KEGG分析在生物信息分析过程中也非常常见，目前有很多方法�
 
 
 
-###**[Metascape基本使用](https://metascape.org/gp/index.html#/main/step1)**
+### **[Metascape基本使用](https://metascape.org/gp/index.html#/main/step1)**
 
 第一步：上传基因list，选择物种，并自定义功能注释
 
@@ -56,7 +56,7 @@ KEGG分析在生物信息分析过程中也非常常见，目前有很多方法�
 
 
 
-###**[ClusterProfiler使用](https://yulab-smu.github.io/clusterProfiler-book/)**
+### **[ClusterProfiler使用](https://yulab-smu.github.io/clusterProfiler-book/)**
 
 第一步： 下载和安装ClusterProfilre
 

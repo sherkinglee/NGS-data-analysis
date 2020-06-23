@@ -1,8 +1,8 @@
-﻿##**GO analysis**
+﻿## **GO analysis**
 
 Gene ontology (GO)分析在生物信息分析过程中非常常见，目前有很多方法可以进行GO分析，包括使用[DAVID](https://david.ncifcrf.gov/), [Metascape](https://metascape.org/gp/index.html#/main/step1)以及[ClusterProfiler](https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html)等等。这里我们分别进行介绍。
 
-###**[DAVID基本使用](https://david.ncifcrf.gov/)**
+### **[DAVID基本使用](https://david.ncifcrf.gov/)**
 
 第一步：点击[Functional Annotation](https://david.ncifcrf.gov/summary.jsp)进入功能注释界面
 
@@ -34,7 +34,7 @@ Gene ontology (GO)分析在生物信息分析过程中非常常见，目前有�
 
 
 
-###**[Metascape基本使用](https://metascape.org/gp/index.html#/main/step1)**
+### **[Metascape基本使用](https://metascape.org/gp/index.html#/main/step1)**
 
 第一步：上传基因list，选择物种，并自定义功能注释
 
@@ -56,7 +56,7 @@ Gene ontology (GO)分析在生物信息分析过程中非常常见，目前有�
 
 
 
-###**[ClusterProfiler使用](https://yulab-smu.github.io/clusterProfiler-book/)**
+### **[ClusterProfiler使用](https://yulab-smu.github.io/clusterProfiler-book/)**
 
 第一步： 下载和安装ClusterProfilre
 
@@ -124,7 +124,7 @@ graph2ppt(y,"GO_comparison.ppt")
 ![image_1e6vd0ejv12tp1k616051cfg11b013.png-97.7kB][13]
 
 
-###**ggplot2 富集分析**
+### **ggplot2 富集分析**
 
 这种情况适用于如果想利用Metascape或者DAVID的富集结果来画cluserProfiler的那种泡泡图，则可以考虑用这种脚本进行绘制。这个我还没有尝试过，以下脚本为旭东师兄所提供。
 

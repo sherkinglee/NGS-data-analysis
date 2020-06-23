@@ -1,5 +1,4 @@
-﻿##**Motifs analysis**
-
+﻿## **Motifs analysis**
 
 常用的motifs分析软件主要包括[MEME](http://meme-suite.org/)和[Homer](http://homer.ucsd.edu/homer/)。[Homer](http://homer.ucsd.edu/homer/)被设计出来主要是分析ChIP-seq数据的，后面也可以用于其他peak file的处理和分析,包括GRO-Seq, RNA-Seq, DNase-Seq, Hi-C。我的分析经验有限，主要是用MEME和homer进行de novo motifs的identification. 其他经验可以参考网上的资料，其中包括清华大学[鲁志老师实验室的学习资料](https://lulab2.gitbook.io/teaching/part-iii.-ngs-data-analyses/5.motif/sequence_motif)
 
