@@ -1,11 +1,11 @@
-﻿##**差异表达分析**
+﻿## **差异表达分析**
 
 
 
 序列比对完之后需要进行read counts的计算，然后进行差异表达分析以及后续的可视化处理和功能分析等等。我刚开始接触到差异分析表达是2017年在清华大学鲁志老师实验室学习到的，当时还是生物信息小白一个，先做的是芯片数据的分析处理，当时用到的工具包就是limma，后面进一步的轮转学习开始逐步接触更多的数据分析工具，其中RNA-seq数据用的最多的就是DESeq2，edgeR等R包，目前Ribo-seq数据分析的也常用我们实验室开发的xtail进行翻译效率（TE）的差异分析，当然也可以继续使用DESeq2进行Ribosome footprints(RPF)的差异分析。这部分我主要从reads counts的计算， 数据的合并，标准化方式的介绍以及不同packages的使用进行介绍。
 
 ---
-##**测序读段的计数（read counts的计算）**
+## **测序读段的计数（read counts的计算）**
 目前计数的工具很多，根据是否需要mapping可以分为alignment-based和alignment-free两种，具体的可以网络上的一篇[博客](https://www.plob.org/article/11504.html)。表达数据的定量，分为三个层次： gene level, transcript level and exon level. 不同的level也有不同的计算方式，这里我们以经典的HTseq对基因level的表达进行定量。
 
 第一步： [HTseq](https://htseq.readthedocs.io/en/master/)下载和安装
@@ -47,7 +47,7 @@ A2ML1-AS2       0
 A2MP1   0
 
 ```
-##**不同样本数据的合并（生成counts 矩阵的过程）**
+## **不同样本数据的合并（生成counts 矩阵的过程）**
 
 如上述，拿到htseq-count的计数结果之后如果需要进行后续分析，最好需要把不同样本的counts文件合并成一个矩阵这样方便统一标准化和处理。在我的分析经验中有很多种不同的方式可以把表达文件合并，bash/R/python都可以。
 
@@ -115,7 +115,7 @@ colnames(data) <- c('sample1','sample2','sample3','sample5')
 略
 ```
 
-##**标准化方式（RPKM，RPM, TPM, DESeq2等）**
+## **标准化方式（RPKM，RPM, TPM, DESeq2等）**
 在NGS数据处理过程中需要考虑很多能够影响不同样品之间表达值比较的因素，包括基因长度、测序深度等等。目前有很多标准化的方式可以在某种程度上消除这种因素的影响，包括RPM, RPKM, TPM, DESeq2标准化方式等等。
 
 第一种： RPM/CPM (Reads/Counts of exon model per Million mapped reads)
@@ -185,9 +185,9 @@ data_normed <- t(t(data)/normalize_factor)
 normalized_counts <- counts(dds, normalized=TRUE)
 ```
 
-##**差异表达分析（limma, edgeR, DESeq2, xtail等）**
+## **差异表达分析（limma, edgeR, DESeq2, xtail等）**
 
-###**[limma使用](http://www.bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf)**
+### **[limma使用](http://www.bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf)**
 
 ```
 ## 安装limma
@@ -235,7 +235,7 @@ diff_results <- topTable(fit2, coef=1, n=Inf,adjust.method ='fdr')
 
 
 
-###**[edgeR使用](http://www.bioconductor.org/packages/release/bioc/html/edgeR.html)**
+### **[edgeR使用](http://www.bioconductor.org/packages/release/bioc/html/edgeR.html)**
 
 ```
 ## 安装edgeR,R>
@@ -284,7 +284,7 @@ lrt <- glmLRT(fit, coef=2) ＃返回差异表达的基因，计算统计量
 ```
 
 
-###**[DESeq2使用](http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html)**
+### **[DESeq2使用](http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html)**
 
 ```
 ## DESeq2安装
@@ -328,7 +328,7 @@ normalized_counts <- counts(data_dds, normalized=TRUE)
 
 
 
-###**[Xtail使用](https://github.com/xryanglab/xtail/blob/master/vignettes/)**
+### **[Xtail使用](https://github.com/xryanglab/xtail/blob/master/vignettes/)**
 
 ```
 ## xtail 下载

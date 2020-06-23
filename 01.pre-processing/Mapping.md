@@ -1,8 +1,8 @@
-﻿##**Mapping**
+﻿## **Mapping**
 
 目前用于序列比对的工具有很多包括BWA, bowtie, bowtie2, tophat, hisat2, STAR等等，每种方法各有优缺点，这里不再详细讨论，具体可参见各自工具的说明文档，我们平时用bowtie/2和STAR比较多，所以这里会以这两个工具为例，介绍其简单的用法，详细的参数见其说明文档，这里也不再说明。
 
-###**bowtie使用**
+### **bowtie使用**
 
 第一步： 安装[bowtie](http://bioconda.github.io/recipes/bowtie/README.html)
 
@@ -34,11 +34,11 @@ bowtie -n 0 -y -a --norc --best --strata -S -p 4 -l 15 --un=$workdir/noncontam_$
 
 具体的参数细节详见[bowtie官网](http://bowtie-bio.sourceforge.net/manual.shtml)
 
-###**bowtie2使用**
+### **bowtie2使用**
 
 这里不再详述，具体细节见官网[bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml)
 
-##**STAR使用**
+## **STAR使用**
 
 第一步：安装[STAR](https://github.com/alexdobin/STAR)
 

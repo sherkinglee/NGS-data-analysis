@@ -131,7 +131,7 @@ multiqc input_dir -o output_dir
 multiqc质控报告示例见[MultiQC官方网站](https://multiqc.info/examples/rna-seq/multiqc_report.html#)
 
 
-##**Part 3: 数据清洗**
+## **Part 3: 数据清洗**
 
 ### **去除接头序列： cutadapt**
 
