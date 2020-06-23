@@ -2,7 +2,7 @@
 
 常用的motifs分析软件主要包括[MEME](http://meme-suite.org/)和[Homer](http://homer.ucsd.edu/homer/)。[Homer](http://homer.ucsd.edu/homer/)被设计出来主要是分析ChIP-seq数据的，后面也可以用于其他peak file的处理和分析,包括GRO-Seq, RNA-Seq, DNase-Seq, Hi-C。我的分析经验有限，主要是用MEME和homer进行de novo motifs的identification. 其他经验可以参考网上的资料，其中包括清华大学[鲁志老师实验室的学习资料](https://lulab2.gitbook.io/teaching/part-iii.-ngs-data-analyses/5.motif/sequence_motif)
 
-###**[Homer](http://homer.ucsd.edu/homer/)**
+### **[Homer](http://homer.ucsd.edu/homer/)**
 
 + 软件下载详见[homer download](http://homer.ucsd.edu/homer/introduction/install.html).
 + Motif finding using fasta file
@@ -36,7 +36,7 @@ annotatePeaks.pl $peakFile hg19 -gtf $annotationFile  > annotationPeaks.txt
 ```
 
 
-###**[MEME](http://meme-suite.org/)**
+### **[MEME](http://meme-suite.org/)**
 
 MEME-suit包括在线工具和单机版的本地工具，两种都可以用，本地工具的参数设置可以更加灵活一些，之前做过测试，在线工具和本地工具call出来的motifs有时候还是存在很大差别的，建议用Homer和MEME都用一下，看看那个更加合适一些。
 
@@ -53,7 +53,7 @@ meme $workdir/374_up_CDS.fa -dna -oc $workdir/up_CDS -nostatus -mod anr -nmotifs
 ```
 
 
-###**注意**
+### **注意**
 
 + homer输出含有html的报告文件，包括de novo的motifs，也包括known motifs，如果觉得homer输出的logo不好看，可以提取其pwm文件，然后用R 包seqLogo进行绘制
 

@@ -1,23 +1,13 @@
 ﻿## **NGS数据前期处理过程**
 
-
-
-
 ## **Part 1: 数据下载**
-
-
-
 
 目前常见的核酸数据库主要有三个，[NCBI](https://www.ncbi.nlm.nih.gov/)的[GeneBank](https://www.ncbi.nlm.nih.gov/)、日本的[DDBJ](https://www.ddbj.nig.ac.jp/index-e.html
 
 )、还有[EMBL](https://www.embl.org/)的[EBI](https://www.ebi.ac.uk/)。最近，中国自己的核酸数据库[GSA](https://bigd.big.ac.cn/gsa/)。但是我只在NCBI上下载过原始数据，所以这里会用NCBI为例介绍数据的下载过程。
 
 
-
-
 ## **Download raw sequence data from  NCBI**
-
-
 
 
 第一种方法：fastq-dump SRRID
