@@ -41,7 +41,7 @@
 
 3） [GO和KEGG以及GSEA的数据分析](https://github.com/sherkinglee/NGS-data-analysis/tree/master/03.functional-analysis)
 
-### **[其他]()**
+### **[其他](https://github.com/sherkinglee/NGS-data-analysis/blob/master/04.sequence-features-analysis)**
 
 1）[motifs分析（MEME, Homer)](https://github.com/sherkinglee/NGS-data-analysis/blob/master/04.sequence-features-analysis/motifs.md)
 
@@ -54,6 +54,20 @@
 5）UTR获取
 
 6）保守性分析
+
+---
+
+### **[常见图表绘制](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots)**
+
+1) [火山图:volcano plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Volcano_plots.md)
+
+2) [韦恩图:venn plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Venn_plots.md)
+
+3) [Metagene plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Metagene_plots.md)
+
+4) [累积密度分布图: cumulative distribution plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Cumulative_distribution_plots.md)
+
+5) [箱型图：boxplot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/boxplot.md)
 
 ---
 
