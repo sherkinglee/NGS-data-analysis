@@ -5,9 +5,13 @@
 因为我从2018年4月开始定导在[清华大学杨雪瑞老师课题组](http://labyang.net/)之后接触的大部分项目都是基于Ribosome profiling数据分析来研究蛋白质的翻译调控的, 所以我的博士生阶段涉及到的主要研究数据类型就是ribosome profiling data，对该数据的分析流程也比较熟悉。这里我会将ribo-seq数据分析的大部分流程都介绍一遍，至于一些个性化的需求，则需要自己慢慢再探索。关于ribosome profling data analysis我会从以下几个方面进行介绍：
 
 1）Ribosome profiling的简单背景介绍
+
 2）Ribosome profiling数据类型和数据特点
+
 3）Ribosome profiling数据上游处理流程
+
 4）Ribosome profiling数据质控过程
+
 5）Ribosome profiling数据下游处理过程
 
 
@@ -16,9 +20,13 @@
 [Ribosome profiling](https://en.wikipedia.org/wiki/Ribosome_profiling)也叫[Ribo-seq](https://en.wikipedia.org/wiki/Ribosome_profiling),是2009年[Ingolia等人](https://science.sciencemag.org/content/324/5924/218)结合深度测序技术，用来对活跃翻译的核糖体在mRNA分子上进行精确定位分析的工具。Ribosome profiling可以用于以下研究：
 
 1）鉴定活跃翻译的开放式阅读框，即鉴定ORF；
+
 2）鉴定翻译起始位点，寻找新的可能的翻译起始信号；
+
 3）对蛋白质进行定量，一个polysome中可以结合多个核糖体，一个核糖体可以产生一条多肽链，用mRNA分子上结合的核糖体的数目表示某一时刻下该mRNA分子的翻译水平；可以用mRNA-seq做标准化，计算翻译效率（TE）表示单个mRNA分子上结合的核糖体数目；
+
 4）监控翻译延长过程中出现的异常翻译调控事件，比如ribosome stalling，表示翻译延长速率收到抑制；
+
 5）研究不同蛋白质之间的co-translation的情况。
 
 ## **Ribosome profiling数据类型和数据特点**
@@ -26,8 +34,11 @@
 [Ribosome profiling](https://en.wikipedia.org/wiki/Ribosome_profiling)数据是基于Ribosome protected fragments测序达到的数据，所以原始数据类型也是fastq格式的。但是相比于mRNA-seq数据类型，ribo-seq数据具有以下几个特点
 
 1）CDS富集： 因为是ribosome protected fragments,所以大部分都是CDS区域的reads
+
 2）3-nt周期性：因为mRNA一般只会沿着一个固定的frame进行翻译，除非发生frame shift等特殊情况，所以在某个特定frame上的reads比其他两个frame上的要明显多很多，加上ribosome是没3个nt移动一个位置的，所以会呈现出明显的3-nt周期性；
+
 3）start codon和stop codon出现峰值，主要是因为翻译起始速率和终止速率比较慢，当然也有CHX药物的作用；
+
 4）长度分布： RNase I--28-30 nt, MNase---35nt
 
 ![image_1eermt8qu15bhqj8161q1a4vnl1m.png-197.5kB][1]
