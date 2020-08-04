@@ -60,17 +60,17 @@
 ### **[常见图表绘制](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots)**
 
 
-1) [火山图:volcano plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Volcano_plots.md)
+1)[火山图:volcano plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Volcano_plots.md)
 
-2) [韦恩图:venn plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Venn_plots.md)
+2)[韦恩图:venn plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Venn_plots.md)
 
-3) [Metagene plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Metagene_plots.md)
+3)[Metagene plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Metagene_plots.md)
 
-4) [累积密度分布图: cumulative distribution plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Cumulative_distribution_plots.md)
+4)[累积密度分布图: cumulative distribution plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Cumulative_distribution_plots.md)
 
-5) [箱型图：boxplot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/boxplot.md)
+5)[箱型图：boxplot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/boxplot.md)
 
-N) [将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Rplots2PPT.md)
+N)[将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Rplots2PPT.md)
 
 ---
 
@@ -80,7 +80,7 @@ N) [将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analysi
 
 2）小RNA数据分析流程（miRNA数据分析）
 
-3）Ribo-seq数据分析流程
+3）[Ribo-seq数据分析流程](https://github.com/sherkinglee/NGS-data-analysis/blob/master/06.projects/Ribo-seq.md)
 
 4）表观组数据分析流程（ATAC-seq，CHIP-seq,])
 
