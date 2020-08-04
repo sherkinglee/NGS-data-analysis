@@ -35,9 +35,9 @@
 
 ### **[拿到差异基因之后的数据分析，可视化和功能富集分析等](https://github.com/sherkinglee/NGS-data-analysis/blob/master/02.differential-expressioin-analysis/visualization.md)**
 
-1） 火山图的绘制
+1） [火山图的绘制](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Volcano_plots.md)
 
-2） 热图的绘制
+2） [热图的绘制]()
 
 3） [GO和KEGG以及GSEA的数据分析](https://github.com/sherkinglee/NGS-data-analysis/tree/master/03.functional-analysis)
 
@@ -59,6 +59,7 @@
 
 ### **[常见图表绘制](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots)**
 
+
 1) [火山图:volcano plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Volcano_plots.md)
 
 2) [韦恩图:venn plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Venn_plots.md)
@@ -68,6 +69,8 @@
 4) [累积密度分布图: cumulative distribution plot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Cumulative_distribution_plots.md)
 
 5) [箱型图：boxplot](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/boxplot.md)
+
+N) [将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Rplots2PPT.md)
 
 ---
 

@@ -121,3 +121,55 @@ bamCoverage -b $bamFile/${i}_STAR/$i.Aligned.sortedByCoord.out.bam -o $workdir/$
 done
 
 ```
+
+## **正负链数据拆分**
+
+## single-end
+
+```
+## forward
+samtools view -F 20 bamFile > forward.bam
+
+## reverse 
+samtools view -f 16 bamFile > revverse.bam
+```
+
+## pair-end, [refer to](https://www.biostars.org/p/92935/)
+
+```
+## forward
+# Forward strand.
+#
+# 1. alignments of the second in pair if they map to the forward strand
+# 2. alignments of the first in pair if they map to the reverse  strand
+#
+samtools view -b -f 128 -F 16 $DATA > fwd1.bam
+samtools index fwd1.bam
+
+samtools view -b -f 80 $DATA > fwd2.bam
+samtools index fwd2.bam
+
+#
+# Combine alignments that originate on the forward strand.
+#
+samtools merge -f fwd.bam fwd1.bam fwd2.bam
+samtools index fwd.bam
+
+## reverse
+# Reverse strand
+#
+# 1. alignments of the second in pair if they map to the reverse strand
+# 2. alignments of the first in pair if they map to the forward strand
+#
+samtools view -b -f 144 $DATA > rev1.bam
+samtools index rev1.bam
+
+samtools view -b -f 64 -F 16 $DATA > rev2.bam
+samtools index rev2.bam
+
+#
+# Combine alignments that originate on the reverse strand.
+#
+samtools merge -f rev.bam rev1.bam rev2.bam
+samtools index rev.bam
+```

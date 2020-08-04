@@ -2,6 +2,8 @@
 
 Metagene plot是指把所有转录本或者基因按照某种规则（如按照某个特定的位置）对齐，画出每个位置上的相对度量。比如说，在ribosome profiling数据中想要看每个转录本起始密码子附近的RPF的相对表达值，就可以用metagene plot的形式展现出来。这里可以提供R和Python两种绘图方式。
 
+---
+
 ### **Python 绘制metagene plot**
 
 关于这一块，主要还是针对Ribo-seq数据来说的，因为我博士阶段主要分析的数据类型就是Ribo-seq，计算的工具主要也是自己开发的小程序[RiboMiner](https://github.com/xryanglab/RiboMiner).
@@ -30,6 +32,7 @@ PlotMetageneAnalysis -i $results/MetageneAnalysis/eIF5A_CDS_normed_dataframe.txt
 ![image_1ebfjl6mep7m1suv9g6fdc14iu9.png-225.7kB][1]
 
 
+---
 
 ### **R 绘制metagene plot**
 输入的数据都是RiboMiner生成的文件，只不过方便绘图，才用R语言进行绘制了一次。
