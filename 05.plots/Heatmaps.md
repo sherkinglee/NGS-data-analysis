@@ -106,7 +106,7 @@ z<-Heatmap(as.matrix(data_selected),col = colorRamp2(c(-0.5,0,0.5), rev(colorRam
 #### **complexHeatmap获取聚类之后的结果**
 
 ```
-ordered_data = data_selected[row_order(z)[[1]],column_order(z)]
+ordered_data = data_selected[row_order(z),column_order(z)]
 ```
 
 ### **Python**
