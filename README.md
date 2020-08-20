@@ -55,6 +55,8 @@
 
 6）保守性分析
 
+7）[转录本定量---Salmon](https://github.com/sherkinglee/NGS-data-analysis/tree/master/04.sequence-features-analysis/isoformQuantification.md)
+
 ---
 
 ### **[常见图表绘制](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots)**
