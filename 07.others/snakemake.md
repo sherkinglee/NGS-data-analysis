@@ -4,7 +4,6 @@
 
 [TOC]
 
-
 ## 概述
 
 Snakemake是一个基于python3的流程搭建软件，主要是能够帮助我们搭建一些可以实现重复使用的分析pipeline。它的官方网址见[Snakemake](https://snakemake.readthedocs.io/en/stable/). 这是我第一次学习Snakemake，然后入门是基于[孟浩巍博士的视频课程](https://ke.qq.com/course/3031316?taid=10368983063478548)。大家感兴趣可以进去看一下。Snakemake有一些优点，可以方便我们进行常用生物信息流程的搭建，包括：
