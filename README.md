@@ -93,3 +93,8 @@ N）[将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analys
 7）单细胞空间转库组数据分析流程
 
 8）miRNA的预测和targets的预测等
+
+---
+### **其他**
+
+1）[snakemake流程搭建流程](https://github.com/sherkinglee/NGS-data-analysis/blob/master/07.others/snakemake.md)
