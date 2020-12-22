@@ -98,3 +98,5 @@ N）[将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analys
 ### **[其他](https://github.com/sherkinglee/NGS-data-analysis/blob/master/07.others/)**
 
 1）[snakemake流程搭建流程](https://github.com/sherkinglee/NGS-data-analysis/blob/master/07.others/snakemake.md)
+
++   [Ribo-seq数据分析流程](https://github.com/sherkinglee/NGS-data-analysis/blob/master/07.others/GSE148636-snakemake.py)
