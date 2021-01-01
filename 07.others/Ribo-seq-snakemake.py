@@ -3,7 +3,7 @@
 Author: Li Fajin
 Date: 2020-12-21 19:59:09
 LastEditors: Li Fajin
-LastEditTime: 2021-01-01 16:56:30
+LastEditTime: 2021-01-01 17:39:06
 Description: snakemake pipeline for ribo-seq data analyses, just for basic control steps such fastqc, cutadapt, qfiltering, mapping, samtools sort and index, 3nt periodicity checking, et al.
 '''
 
@@ -303,7 +303,7 @@ rule mergeLogs:
         starMappingLogs=[filename for filename in os.listdir(".") if "Star_mapping" in  filename],
         statisticsLogs=[filename for filename in os.listdir(".") if "Statistics" in  filename]
     output:
-        "12.summary/RNA_seq_summary_statistics.txt"
+        "12.summary/Ribo_seq_summary_statistics.txt"
     run:
         shell("echo -e '# cutadapt\nsample\tTotal\tTrimmed(Percent)\tshortNum(Percentage)\tLeftNum(Percentage)' >> {output} ")
         shell("cat {input.cutadaptLogs}>> {output}")
