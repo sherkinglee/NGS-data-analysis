@@ -4,6 +4,7 @@
 
 [TOC]
 
+
 ## 概述
 
 Snakemake是一个基于python3的流程搭建软件，主要是能够帮助我们搭建一些可以实现重复使用的分析pipeline。它的官方网址见[Snakemake](https://snakemake.readthedocs.io/en/stable/). 这是我第一次学习Snakemake，然后入门是基于[孟浩巍博士的视频课程](https://ke.qq.com/course/3031316?taid=10368983063478548)。大家感兴趣可以进去看一下。Snakemake有一些优点，可以方便我们进行常用生物信息流程的搭建，包括：
@@ -139,6 +140,7 @@ rule all:
         expand("07.STAR/{sample}_STAR/{sample}.Log.final.out",sample=SAMPLES),
         expand("07.STAR/{sample}_STAR/{sample}.Aligned.toTranscriptome.out.sorted.bam",sample=SAMPLES),
         expand("07.STAR/{sample}_STAR/{sample}.Aligned.{type}.bam.bai",sample=SAMPLES,type={"sortedByCoord.out","toTranscriptome.out.sorted"}),
+        expand("07.STAR/{sample}_STAR/{sample}.bw",sample=SAMPLES),
         expand("08.periodicity/{sample}{sample}.Aligned.toTranscriptome.out.pdf",sample=SAMPLES),
         expand("08.periodicity/{sample}_pre_config.txt",sample=SAMPLES),
         expand("09.LengthDistribution/{sample}_reads_length.pdf",sample=SAMPLES),
@@ -147,23 +149,33 @@ rule all:
         expand("11.RPF_statistics/{sample}_DNA.pdf",sample=SAMPLES),
         expand("11.RPF_statistics/{sample}_Intron.pdf",sample=SAMPLES),
         expand("11.RPF_statistics/{sample}_RNA.pdf",sample=SAMPLES),
-        expand("11.RPF_statistics/{sample}_reads_distribution.txt",sample=SAMPLES)
+        expand("11.RPF_statistics/{sample}_reads_distribution.txt",sample=SAMPLES),
+        expand("{sample}_Cutadapt.txt",sample=SAMPLES),
+        expand("{sample}_Filtering.txt",sample=SAMPLES),
+        expand("{sample}_RRNA_contam.txt",sample=SAMPLES),
+        expand("{sample}_Star_mapping.txt",sample=SAMPLES),
+        expand("{sample}_Statistics.txt",sample=SAMPLES),
+        expand("12.summary/Ribo_seq_summary_statistics.txt")
 ```
 
 + samples, paramters and tools defination （根据流程需要随时写）
 
 ```
+import os
+
 ## samples defination
-SAMPLES=["SRR11542141",
-         "SRR11542142"]
+SAMPLES=["SRR8445000",
+         "SRR8445001",
+	 "SRR8445002",
+	 "SRR8445003"]
 
 
 ## parameters defination
-BOWTIE_NONCODING_INDEX="/Share2/home/lifj/Reference/human/hg38/ensemble/rRNA_bowtieIndex/human_rRNA"
-STAR_GENOME_INDEX="/Share2/home/lifj/Reference/human/hg38/ensemble/STAR_Human_Ensembl_GRCh38_Ensembl"
-RIBOCODE_ANNOT="/Share2/home/lifj/Reference/human/hg38/ensemble/RiboCode_annot_Human/RiboCode_annot"
-GTFFILE="/Share2/home/lifj/Reference/human/hg38/ensemble/Homo_sapiens.GRCh38.88.gtf"
-ADAPTER="CTGTAGGCACCATCAAT"
+BOWTIE_NONCODING_INDEX="/workdata/home/lifj/lifj/data/Reference/human/rRNA_bowtieIndex/human_rRNA"
+STAR_GENOME_INDEX="/workdata/home/lifj/lifj/data/Reference/human/STAR_Human_Ensembl_GRCh38_Ensembl"
+RIBOCODE_ANNOT="/workdata/home/lifj/lifj/data/Reference/human/RiboCode_annot_Human/RiboCode_annot"
+GTFFILE="/workdata/home/lifj/lifj/data/Reference/human/Homo_sapiens.GRCh38.88.gtf"
+ADAPTER="TGGAATTCTCGGGTGCCA"
 
 
 ## softwares defination
@@ -189,6 +201,9 @@ with os.popen("which ModifyHTseq") as path:
     MODIFYHTSEQ = path.read().strip()
 with os.popen("which StatisticReadsOnDNAsContam") as path:
     STATISTICREADSONDNASCONTAM = path.read().strip()
+with os.popen("which bamCoverage") as path:
+    BAMCOVERAGE = path.read().strip()
+
 ```
 
 + beforeQC
@@ -199,6 +214,7 @@ rule beforeQC:
         "../00.rawdata/{sample}.fastq"
     output:
         directory("01.beforeQC/{sample}")
+    threads: 1
     shell:
         """
         mkdir -p {output}
@@ -216,6 +232,7 @@ rule Cutadapt:
         "02.cutadapt/{sample}_trimmed.fastq"
     log:
         "02.cutadapt/{sample}_trimmed.log"
+    threads: 1
     shell:
         """
         {CUTADAPT} -m 20 -M 40 --match-read-wildcards -a {ADAPTER} -o {output} {input} > {log} 2>&1
@@ -232,6 +249,7 @@ rule quality_filter:
         "03.filter/{sample}_trimmed_Qfilter.fastq"
     log:
         "03.filter/{sample}_trimmed_Qfilter.log"
+    threads: 1
     shell:
         """
         {FILTER} -Q33 -v -q 25 -p 75 -i {input} -o {output} > {log} 2>&1
@@ -246,6 +264,7 @@ rule afterQC:
         "03.filter/{sample}_trimmed_Qfilter.fastq"
     output:
         directory("04.afterQC/{sample}")
+    threads: 1
     shell:
         """
         mkdir -p {output}
@@ -266,6 +285,7 @@ rule remove_rRNA:
         "05.contam/noncontam_{sample}.fastq"
     log:
         "05.contam/{sample}.log"
+    threads: 1
     shell:
         """
         {BOWTIE} -n 0 -y -a --norc --best --strata -S -p 4 -l 15 --un={output[1]} {BOWTIE_NONCODING_INDEX} -q {input} {output[0]} > {log} 2>&1
@@ -305,16 +325,23 @@ rule STAR:
         "07.STAR/{sample}_STAR/{sample}.Signal.Unique.str1.out.wig",
         "07.STAR/{sample}_STAR/{sample}.Signal.Unique.str2.out.wig",
         "07.STAR/{sample}_STAR/{sample}.SJ.out.tab"
+    threads: 4
     shell:
         """
-        {STAR} --runThreadN 8 --outFilterType Normal --outWigType wiggle --outWigStrand Stranded \
-            --outWigNorm RPM --alignEndsType EndToEnd --outFilterMismatchNmax 1\
-            --outFilterMultimapNmax 1 --genomeDir {STAR_GENOME_INDEX} --readFilesIn {input} \
-            --outFileNamePrefix  07.STAR/{wildcards.sample}_STAR/{wildcards.sample}. \
-            --outSAMtype BAM SortedByCoordinate --quantMode TranscriptomeSAM GeneCounts \
-            --outSAMattributes All
+        {STAR} --runThreadN {threads} --outFilterType Normal --outWigType wiggle \
+        --outWigStrand Stranded --outWigNorm RPM --alignEndsType EndToEnd \
+        --outFilterMismatchNmax 1 --outFilterMultimapNmax 1 --genomeDir {STAR_GENOME_INDEX} \
+        --readFilesIn {input} \
+        --outFileNamePrefix 07.STAR/{wildcards.sample}_STAR/{wildcards.sample}. \
+        --outSAMtype BAM SortedByCoordinate --quantMode TranscriptomeSAM GeneCounts \
+        --outSAMattributes All
         """
+
+
+## 若是出现unique mapping reads特别低的并且star log file中显示Number of reads unmapped: too short太多时，可以调节--outFilterMatchNmin 参数，如换做15 or 16那么这部分比例会降低，unqiue和multiple mapping的reads会升高。
 ```
+
+
 
 + samtools sort
 
@@ -324,6 +351,7 @@ rule samtools_sort:
         "07.STAR/{sample}_STAR/{sample}.Aligned.toTranscriptome.out.bam"
     output:
         "07.STAR/{sample}_STAR/{sample}.Aligned.toTranscriptome.out.sorted.bam"
+    threads: 1
     shell:
         "{SAMTOOLS} sort -T {output}.temp -o {output} {input}"
 ```
@@ -336,8 +364,27 @@ rule samtools_index:
         "07.STAR/{sample}_STAR/{sample}.Aligned.{type}.bam"
     output:
         "07.STAR/{sample}_STAR/{sample}.Aligned.{type}.bam.bai"
+    threads: 1
     shell:
         "{SAMTOOLS} index {input}"
+```
+
++ bam2bigwig
+
+```
+rule bam2bigwig:
+    input:
+        "07.STAR/{sample}_STAR/{sample}.Aligned.sortedByCoord.out.bam"
+    output:
+        "07.STAR/{sample}_STAR/{sample}.bw"
+    log:
+        "07.STAR/{sample}_STAR/{sample}.bam2bw.log"
+    threads: 2
+    shell:
+        """
+        {BAMCOVERAGE} -b {input} -o {output} --normalizeUsing CPM --binSize 1 > {log} 2>&1
+        """
+## 这一步比较耗时
 ```
 
 + 3-nt periodicity checking
@@ -349,8 +396,9 @@ rule periodicity:
     output:
         "08.periodicity/{sample}{sample}.Aligned.toTranscriptome.out.pdf",
         "08.periodicity/{sample}_pre_config.txt"
+    threads: 1
     shell:
-        "{METAPLOTS} -a {RIBOCODE_ANNOT} -r {input} -o 08.periodicity/{wildcards.sample}"
+        "{METAPLOTS} -a {RIBOCODE_ANNOT} -r {input} -o 08.periodicity/{wildcards.sample} -m 20 -M 40"
 ```
 
 + length statistics
@@ -362,8 +410,12 @@ rule length_distribution:
     output:
         "09.LengthDistribution/{sample}_reads_length.pdf",
         "09.LengthDistribution/{sample}_reads_length.txt"
+    log:
+        "09.LengthDistribution/{sample}_reads_length.log"
+    threads: 1
     shell:
-        "{LENGTHDISTRIBUTION} -i {input} -o 09.LengthDistribution/{wildcards.sample} -f bam"
+        "{LENGTHDISTRIBUTION} -i {input} -o 09.LengthDistribution/{wildcards.sample} -f bam > {log} 2>&1"
+
 ```
 
 + htseq_counts
@@ -376,10 +428,12 @@ rule htseq_count:
         "10.read_counts/{sample}.counts"
     log:
         "10.read_counts/{sample}.counts.log"
+    threads: 1
     shell:
         """
         {MODIFYHTSEQ} -i {input} -g {GTFFILE} -o {output} -t CDS -m union -q 10 --minLen 25 --maxLen 35 --exclude-first 45 --exclude-last 15 --id-type gene_name > {log} 2>&1
         """
+
 ```
 
 + statistic contaminations
@@ -395,6 +449,7 @@ rule statistic_contamination:
         "11.RPF_statistics/{sample}_reads_distribution.txt"
     log:
         "11.RPF_statistics/{sample}.statistics.log"
+    threads: 1
     shell:
         """
         {STATISTICREADSONDNASCONTAM} -i  {input}  -g {GTFFILE}  -o  11.RPF_statistics/{wildcards.sample} > {log} 2>&1
@@ -402,7 +457,228 @@ rule statistic_contamination:
 ```
 
 
-+ summary
++ summary log files of each step
+
+```
+rule summary:
+    input:
+        cutadapt="02.cutadapt/{sample}_trimmed.log",
+        filtering="03.filter/{sample}_trimmed_Qfilter.log",
+        removeRNAcontam="05.contam/{sample}.log",
+        starMapping="07.STAR/{sample}_STAR/{sample}.Log.final.out",
+        statistics="11.RPF_statistics/{sample}_reads_distribution.txt"
+    output:
+        cutadaptLog=temp("{sample}_Cutadapt.txt"),
+        filteringLog=temp("{sample}_Filtering.txt"),
+        rRNAContamLog=temp("{sample}_RRNA_contam.txt"),
+        starMappingLog=temp("{sample}_Star_mapping.txt"),
+        statisticsLog=temp("{sample}_Statistics.txt")
+        # finalLog="RNA_seq_summary_statistics.txt"
+
+    shell:
+        """
+        python summary.py -f {input.filtering}  --of {output.filteringLog} \
+        -c {input.cutadapt}  --oc {output.cutadaptLog} \
+        -r {input.removeRNAcontam} --or {output.rRNAContamLog} \
+        -s {input.statistics} --os {output.statisticsLog}\
+        -m {input.starMapping} --om {output.starMappingLog}
+        """
+
+
+## 其中summary.py的内如如下：
+$ vim summary.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+'''
+Author: Li Fajin
+Date: 2020-12-31 18:49:06
+LastEditors: Li Fajin
+LastEditTime: 2021-01-01 16:42:11
+Description: summary of processed reads from all steps
+'''
+
+
+import re
+import os
+import sys
+from optparse import OptionParser
+
+
+def create_parser_for_reads_summary():
+	'''argument parser.'''
+	usage="usage: python %prog "
+	parser=OptionParser(usage=usage)
+	parser.add_option("-c","--cutadapt",action="store",type="string",dest="cutadaptLog",
+			help="Log file generated by cutadapt.")
+	parser.add_option("-f","--filtering",action="store",type="string",dest="filteringLog",
+			help="Log file generated by fastq_quality_filter.")
+	parser.add_option("-r","--rRNA-contam",action="store",type="string",dest="rRNAcontamLog",
+			help="Log file generated by rRNA contamination.")
+	parser.add_option("-m","--star-mapping",action="store",type="string",dest="starMapping",
+			help="Log file generated by star mapping.")
+	parser.add_option("-s","--statistics",action="store",type="string",dest="statistics",
+			help="Log file generated by STATISTICREADSONDNASCONTAM.")
+	parser.add_option("--oc",action="store",type="string",dest="outCutadapt",help="output file for cutadapt log")
+	parser.add_option("--of",action="store",type="string",dest="outFiltering",help="output file for filtering log")
+	parser.add_option("--or",action="store",type="string",dest="outrRNAcontam",help="output file for rRNA contamination log")
+	parser.add_option("--om",action="store",type="string",dest="outMapping",help="output file for star mapping log")
+	parser.add_option("--os",action="store",type="string",dest="outStatistics",help="output file for DNA contamination statistics log")
+	return parser
+
+def mergeCutadaptLogs(cutadaptLog,outCutadapt):
+    sample=os.path.split(cutadaptLog)[1].strip().split("_")[0]
+    fout=open(outCutadapt,'w')
+    with open(cutadaptLog,'r') as f:
+        for line in f:
+            if "Total reads processed" in line:
+                total_reads=line.strip().split(":")[1].strip()
+                fout.write(sample+"\t"+total_reads+"\t")
+            elif "Reads with adapters" in line:
+                reads_with_adapter=line.strip().split(":")[1].strip()
+                fout.write(reads_with_adapter+"\t")
+            elif "Reads that were too short" in line:
+                reads_too_short=line.strip().split(":")[1].strip()
+                fout.write(reads_too_short+"\t")
+            elif "Reads written (passing filters)" in line:
+                reads_left=line.strip().split(":")[1].strip()
+                fout.write(reads_left+"\n")
+            else:
+                continue
+    fout.close()
+
+def mergeFilteringLogs(filteringLog,outFiltering):
+    sample=os.path.split(filteringLog)[1].strip().split("_")[0]
+    fout=open(outFiltering,'w')
+    with open(filteringLog,'r') as f:
+        for line in f:
+            if "Input" in line:
+                input_reads=line.strip().split(":")[1].strip().split(" ")[0]
+                fout.write(sample+"\t"+input_reads+"\t")
+            elif "Output" in line:
+                Output_reads=line.strip().split(":")[1].strip().split(" ")[0]
+                fout.write(Output_reads+"\t")
+            elif "discarded" in line:
+                discarded_reads=re.findall("\d+.*\(.*\)",line)[0]
+                fout.write(discarded_reads+"\n")
+            else:
+                continue
+    fout.close()
+
+def mergerRNAContamLogs(rRNAcontamLog,outrRNAcontam):
+    sample=os.path.split(rRNAcontamLog)[1].strip().split(".")[0]
+    fout=open(outrRNAcontam,'w')
+    with open(rRNAcontamLog,'r') as f:
+        for line in f:
+            if "reads processed" in line:
+                processed_reads=line.strip().split(":")[1].strip()
+                fout.write(sample+"\t"+processed_reads+"\t")
+            elif "reads with at least one reported alignment" in line:
+                reported_reads=line.strip().split(":")[1].strip()
+                fout.write(reported_reads+"\t")
+            elif "reads that failed to align" in line:
+                failed_reads=line.strip().split(":")[1].strip()
+                fout.write(failed_reads+"\n")
+            else:
+                continue
+    fout.close()
+
+def mergerMappingLogs(starMapping,outMapping):
+    sample=os.path.split(starMapping)[1].strip().split(".")[0]
+    fout=open(outMapping,'w')
+    with open(starMapping,'r') as f:
+        for line in f:
+            if "Number of input reads" in line:
+                input_reads=line.strip().split("|")[1].strip()
+                fout.write(sample+"\t"+input_reads+"\t")
+            elif "Uniquely mapped reads number" in line:
+                unique_reads=line.strip().split("|")[1].strip()
+            elif "Uniquely mapped reads %" in line:
+                unique_ratio=line.strip().split("|")[1].strip()
+                fout.write(unique_reads+" ("+unique_ratio+")"+"\t")
+            elif "Number of reads mapped to too many loci" in line:
+                multi_reads=line.strip().split("|")[1].strip()
+            elif "% of reads mapped to too many loci" in line:
+                multi_ratio=line.strip().split("|")[1].strip()
+                fout.write(multi_reads+" ("+multi_ratio+")"+"\n")
+            else:
+                continue
+
+    fout.close()
+
+def mergerStatisticsLogs(statistics,outStatistics):
+    sample=os.path.split(statistics)[1].strip().split("_")[0]
+    fout=open(outStatistics,'w')
+    with open(statistics,'r') as f:
+        for line in f:
+            if "unique mapped reads of exon" in line:
+                exon_reads=line.strip().split(":")[1].strip()
+                fout.write(sample+"\t"+exon_reads+"\t")
+            elif "unique mapped reads of intergenic region" in line:
+                DNA_reads=line.strip().split(":")[1].strip()
+                fout.write(DNA_reads+"\t")
+            elif "unique mapped reads of intron" in line:
+                intron_reads=line.strip().split(":")[1].strip()
+                fout.write(intron_reads+"\t")
+            elif "unique mapped ambiguous reads of RNA" in line:
+                RNA_ambiguous=line.strip().split(":")[1].strip()
+                fout.write(RNA_ambiguous+"\n")
+            else:
+                continue
+    fout.close()
+
+def main():
+    parser=create_parser_for_reads_summary()
+    (options,args)=parser.parse_args()
+    if options.cutadaptLog and options.outCutadapt:
+        print("Start cutadapt...")
+        mergeCutadaptLogs(options.cutadaptLog,options.outCutadapt)
+    if options.filteringLog and options.outFiltering:
+        print("Start filtering...")
+        mergeFilteringLogs(options.filteringLog,options.outFiltering)
+    if options.rRNAcontamLog and options.outrRNAcontam:
+        print("Start rRNA contam...")
+        mergerRNAContamLogs(options.rRNAcontamLog,options.outrRNAcontam)
+    if options.starMapping and options.outMapping:
+        print("Start star mapping...")
+        mergerMappingLogs(options.starMapping,options.outMapping)
+    if options.statistics and options.outStatistics:
+        print("Start statistics...")
+        mergerStatisticsLogs(options.statistics,options.outStatistics)
+    print("Finish!")
+
+if __name__=="__main__":
+    main()
+
+```
+
++ merge all logs files
+
+```
+rule mergeLogs:
+    input:
+        cutadaptLogs=[filename for filename in os.listdir(".") if "Cutadapt" in  filename],
+        filteringLogs=[filename for filename in os.listdir(".") if "Filtering" in  filename],
+        rRNAContamLogs=[filename for filename in os.listdir(".") if "RRNA_contam" in  filename],
+        starMappingLogs=[filename for filename in os.listdir(".") if "Star_mapping" in  filename],
+        statisticsLogs=[filename for filename in os.listdir(".") if "Statistics" in  filename]
+    output:
+        "12.summary/RNA_seq_summary_statistics.txt"
+    run:
+        shell("echo -e '# cutadapt\nsample\tTotal\tTrimmed(Percent)\tshortNum(Percentage)\tLeftNum(Percentage)' >> {output} ")
+        shell("cat {input.cutadaptLogs}>> {output}")
+        shell("echo -e '# filtering\nsample\tinputNum\tRemained\tdiscarded(Percent)' >> {output} ")
+        shell("cat {input.filteringLogs}>> {output}")
+        shell("echo -e '# remove RNA contamination\nsample\tProcessedNum\trRNA(Percent)\tnoContamRNA(Percent)' >> {output} ")
+        shell("cat {input.rRNAContamLogs}>> {output}")
+        shell("echo -e '# Star mapping\nsample\tinput\tUniquelyMapped(Percent)\tMutipulMapped(Percent)' >> {output} ")
+        shell("cat {input.starMappingLogs}>> {output}")
+        shell("echo -e '# DNA contamination\nsample\tExon\tDNA\tIntron\tambiguous_RNA' >> {output} ")
+        shell("cat {input.statisticsLogs}>> {output}")
+
+```
+
+
++ summary all rules of snakemake file
 
 最后整个snakemake流程如下：
 
@@ -412,23 +688,25 @@ rule statistic_contamination:
 Author: Li Fajin
 Date: 2020-12-21 19:59:09
 LastEditors: Li Fajin
-LastEditTime: 2020-12-22 14:52:35
+LastEditTime: 2021-01-01 16:56:30
 Description: snakemake pipeline for ribo-seq data analyses, just for basic control steps such fastqc, cutadapt, qfiltering, mapping, samtools sort and index, 3nt periodicity checking, et al.
 '''
 
 import os
 
 ## samples defination
-SAMPLES=["SRR11542141",
-         "SRR11542142"]
+SAMPLES=["SRR8445000",
+         "SRR8445001",
+	 "SRR8445002",
+	 "SRR8445003"]
 
 
 ## parameters defination
-BOWTIE_NONCODING_INDEX="/Share2/home/lifj/Reference/human/hg38/ensemble/rRNA_bowtieIndex/human_rRNA"
-STAR_GENOME_INDEX="/Share2/home/lifj/Reference/human/hg38/ensemble/STAR_Human_Ensembl_GRCh38_Ensembl"
-RIBOCODE_ANNOT="/Share2/home/lifj/Reference/human/hg38/ensemble/RiboCode_annot_Human/RiboCode_annot"
-GTFFILE="/Share2/home/lifj/Reference/human/hg38/ensemble/Homo_sapiens.GRCh38.88.gtf"
-ADAPTER="CTGTAGGCACCATCAAT"
+BOWTIE_NONCODING_INDEX="/workdata/home/lifj/lifj/data/Reference/human/rRNA_bowtieIndex/human_rRNA"
+STAR_GENOME_INDEX="/workdata/home/lifj/lifj/data/Reference/human/STAR_Human_Ensembl_GRCh38_Ensembl"
+RIBOCODE_ANNOT="/workdata/home/lifj/lifj/data/Reference/human/RiboCode_annot_Human/RiboCode_annot"
+GTFFILE="/workdata/home/lifj/lifj/data/Reference/human/Homo_sapiens.GRCh38.88.gtf"
+ADAPTER="TGGAATTCTCGGGTGCCA"
 
 
 ## softwares defination
@@ -454,6 +732,8 @@ with os.popen("which ModifyHTseq") as path:
     MODIFYHTSEQ = path.read().strip()
 with os.popen("which StatisticReadsOnDNAsContam") as path:
     STATISTICREADSONDNASCONTAM = path.read().strip()
+with os.popen("which bamCoverage") as path:
+    BAMCOVERAGE = path.read().strip()
 
 
 ## snakemakes pipeline
@@ -471,6 +751,7 @@ rule all:
         expand("07.STAR/{sample}_STAR/{sample}.Log.final.out",sample=SAMPLES),
         expand("07.STAR/{sample}_STAR/{sample}.Aligned.toTranscriptome.out.sorted.bam",sample=SAMPLES),
         expand("07.STAR/{sample}_STAR/{sample}.Aligned.{type}.bam.bai",sample=SAMPLES,type={"sortedByCoord.out","toTranscriptome.out.sorted"}),
+        expand("07.STAR/{sample}_STAR/{sample}.bw",sample=SAMPLES),
         expand("08.periodicity/{sample}{sample}.Aligned.toTranscriptome.out.pdf",sample=SAMPLES),
         expand("08.periodicity/{sample}_pre_config.txt",sample=SAMPLES),
         expand("09.LengthDistribution/{sample}_reads_length.pdf",sample=SAMPLES),
@@ -479,13 +760,20 @@ rule all:
         expand("11.RPF_statistics/{sample}_DNA.pdf",sample=SAMPLES),
         expand("11.RPF_statistics/{sample}_Intron.pdf",sample=SAMPLES),
         expand("11.RPF_statistics/{sample}_RNA.pdf",sample=SAMPLES),
-        expand("11.RPF_statistics/{sample}_reads_distribution.txt",sample=SAMPLES)
+        expand("11.RPF_statistics/{sample}_reads_distribution.txt",sample=SAMPLES),
+        expand("{sample}_Cutadapt.txt",sample=SAMPLES),
+        expand("{sample}_Filtering.txt",sample=SAMPLES),
+        expand("{sample}_RRNA_contam.txt",sample=SAMPLES),
+        expand("{sample}_Star_mapping.txt",sample=SAMPLES),
+        expand("{sample}_Statistics.txt",sample=SAMPLES),
+        expand("12.summary/Ribo_seq_summary_statistics.txt")
 
 rule beforeQC:
     input:
         "../00.rawdata/{sample}.fastq"
     output:
         directory("01.beforeQC/{sample}")
+    threads: 1
     shell:
         """
         mkdir -p {output}
@@ -499,6 +787,7 @@ rule Cutadapt:
         "02.cutadapt/{sample}_trimmed.fastq"
     log:
         "02.cutadapt/{sample}_trimmed.log"
+    threads: 1
     shell:
         """
         {CUTADAPT} -m 20 -M 40 --match-read-wildcards -a {ADAPTER} -o {output} {input} > {log} 2>&1
@@ -511,6 +800,7 @@ rule quality_filter:
         "03.filter/{sample}_trimmed_Qfilter.fastq"
     log:
         "03.filter/{sample}_trimmed_Qfilter.log"
+    threads: 1
     shell:
         """
         {FILTER} -Q33 -v -q 25 -p 75 -i {input} -o {output} > {log} 2>&1
@@ -521,6 +811,7 @@ rule afterQC:
         "03.filter/{sample}_trimmed_Qfilter.fastq"
     output:
         directory("04.afterQC/{sample}")
+    threads: 1
     shell:
         """
         mkdir -p {output}
@@ -535,6 +826,7 @@ rule remove_rRNA:
         "05.contam/noncontam_{sample}.fastq"
     log:
         "05.contam/{sample}.log"
+    threads: 1
     shell:
         """
         {BOWTIE} -n 0 -y -a --norc --best --strata -S -p 4 -l 15 --un={output[1]} {BOWTIE_NONCODING_INDEX} -q {input} {output[0]} > {log} 2>&1
@@ -546,6 +838,7 @@ rule finalQC:
         "05.contam/noncontam_{sample}.fastq"
     output:
         directory("06.finalQC/{sample}")
+    threads: 1
     shell:
         """
         mkdir -p {output}
@@ -567,11 +860,13 @@ rule STAR:
         "07.STAR/{sample}_STAR/{sample}.Signal.Unique.str1.out.wig",
         "07.STAR/{sample}_STAR/{sample}.Signal.Unique.str2.out.wig",
         "07.STAR/{sample}_STAR/{sample}.SJ.out.tab"
+    threads: 4
     shell:
         """
-        {STAR} --runThreadN 8 --outFilterType Normal --outWigType wiggle --outWigStrand Stranded \
-            --outWigNorm RPM --alignEndsType EndToEnd --outFilterMismatchNmax 1\
-            --outFilterMultimapNmax 1 --genomeDir {STAR_GENOME_INDEX} --readFilesIn {input} \
+        ## part of parameters from GSE125114
+        {STAR} --runThreadN {threads} --outFilterType Normal --outWigType wiggle --outWigStrand Stranded \
+            --outWigNorm RPM --alignEndsType EndToEnd --outFilterMismatchNmax 2 \
+            --outFilterMultimapNmax 20 --outFilterMismatchNoverLmax 0.04 --outFilterMatchNmin 15 --genomeDir {STAR_GENOME_INDEX} --readFilesIn {input} \
             --outFileNamePrefix  07.STAR/{wildcards.sample}_STAR/{wildcards.sample}. \
             --outSAMtype BAM SortedByCoordinate --quantMode TranscriptomeSAM GeneCounts \
             --outSAMattributes All
@@ -582,6 +877,7 @@ rule samtools_sort:
         "07.STAR/{sample}_STAR/{sample}.Aligned.toTranscriptome.out.bam"
     output:
         "07.STAR/{sample}_STAR/{sample}.Aligned.toTranscriptome.out.sorted.bam"
+    threads: 1
     shell:
         "{SAMTOOLS} sort -T {output}.temp -o {output} {input}"
 
@@ -591,8 +887,22 @@ rule samtools_index:
         "07.STAR/{sample}_STAR/{sample}.Aligned.{type}.bam"
     output:
         "07.STAR/{sample}_STAR/{sample}.Aligned.{type}.bam.bai"
+    threads: 1
     shell:
         "{SAMTOOLS} index {input}"
+
+rule bam2bigwig:
+    input:
+        "07.STAR/{sample}_STAR/{sample}.Aligned.sortedByCoord.out.bam"
+    output:
+        "07.STAR/{sample}_STAR/{sample}.bw"
+    log:
+        "07.STAR/{sample}_STAR/{sample}.bam2bw.log"
+    threads: 2
+    shell:
+        """
+        {BAMCOVERAGE} -b {input} -o {output} --normalizeUsing CPM --binSize 1 > {log} 2>&1
+        """
 
 rule periodicity:
     input:
@@ -600,8 +910,9 @@ rule periodicity:
     output:
         "08.periodicity/{sample}{sample}.Aligned.toTranscriptome.out.pdf",
         "08.periodicity/{sample}_pre_config.txt"
+    threads: 1
     shell:
-        "{METAPLOTS} -a {RIBOCODE_ANNOT} -r {input} -o 08.periodicity/{wildcards.sample}"
+        "{METAPLOTS} -a {RIBOCODE_ANNOT} -r {input} -o 08.periodicity/{wildcards.sample} -m 20 -M 40"
 
 rule length_distribution:
     input:
@@ -609,8 +920,11 @@ rule length_distribution:
     output:
         "09.LengthDistribution/{sample}_reads_length.pdf",
         "09.LengthDistribution/{sample}_reads_length.txt"
+    log:
+        "09.LengthDistribution/{sample}_reads_length.log"
+    threads: 1
     shell:
-        "{LENGTHDISTRIBUTION} -i {input} -o 09.LengthDistribution/{wildcards.sample} -f bam"
+        "{LENGTHDISTRIBUTION} -i {input} -o 09.LengthDistribution/{wildcards.sample} -f bam > {log} 2>&1"
 
 
 # specifically for Ribo-seq data, if you have RNA-seq data, using htseq-count please.
@@ -621,6 +935,7 @@ rule htseq_count:
         "10.read_counts/{sample}.counts"
     log:
         "10.read_counts/{sample}.counts.log"
+    threads: 1
     shell:
         """
         {MODIFYHTSEQ} -i {input} -g {GTFFILE} -o {output} -t CDS -m union -q 10 --minLen 25 --maxLen 35 --exclude-first 45 --exclude-last 15 --id-type gene_name > {log} 2>&1
@@ -636,10 +951,57 @@ rule statistic_contamination:
         "11.RPF_statistics/{sample}_reads_distribution.txt"
     log:
         "11.RPF_statistics/{sample}.statistics.log"
+    threads: 1
     shell:
         """
         {STATISTICREADSONDNASCONTAM} -i  {input}  -g {GTFFILE}  -o  11.RPF_statistics/{wildcards.sample} > {log} 2>&1
         """
+
+
+rule summary:
+    input:
+        cutadapt="02.cutadapt/{sample}_trimmed.log",
+        filtering="03.filter/{sample}_trimmed_Qfilter.log",
+        removeRNAcontam="05.contam/{sample}.log",
+        starMapping="07.STAR/{sample}_STAR/{sample}.Log.final.out",
+        statistics="11.RPF_statistics/{sample}_reads_distribution.txt"
+    output:
+        cutadaptLog=temp("{sample}_Cutadapt.txt"),
+        filteringLog=temp("{sample}_Filtering.txt"),
+        rRNAContamLog=temp("{sample}_RRNA_contam.txt"),
+        starMappingLog=temp("{sample}_Star_mapping.txt"),
+        statisticsLog=temp("{sample}_Statistics.txt")
+        # finalLog="RNA_seq_summary_statistics.txt"
+
+    shell:
+        """
+        python summary.py -f {input.filtering}  --of {output.filteringLog} -c {input.cutadapt}  --oc {output.cutadaptLog} \
+            -r {input.removeRNAcontam} --or {output.rRNAContamLog} -s {input.statistics} --os {output.statisticsLog}\
+            -m {input.starMapping} --om {output.starMappingLog}
+        """
+
+rule mergeLogs:
+    input:
+        cutadaptLogs=[filename for filename in os.listdir(".") if "Cutadapt" in  filename],
+        filteringLogs=[filename for filename in os.listdir(".") if "Filtering" in  filename],
+        rRNAContamLogs=[filename for filename in os.listdir(".") if "RRNA_contam" in  filename],
+        starMappingLogs=[filename for filename in os.listdir(".") if "Star_mapping" in  filename],
+        statisticsLogs=[filename for filename in os.listdir(".") if "Statistics" in  filename]
+    output:
+        "12.summary/RNA_seq_summary_statistics.txt"
+    run:
+        shell("echo -e '# cutadapt\nsample\tTotal\tTrimmed(Percent)\tshortNum(Percentage)\tLeftNum(Percentage)' >> {output} ")
+        shell("cat {input.cutadaptLogs}>> {output}")
+        shell("echo -e '# filtering\nsample\tinputNum\tRemained\tdiscarded(Percent)' >> {output} ")
+        shell("cat {input.filteringLogs}>> {output}")
+        shell("echo -e '# remove RNA contamination\nsample\tProcessedNum\trRNA(Percent)\tnoContamRNA(Percent)' >> {output} ")
+        shell("cat {input.rRNAContamLogs}>> {output}")
+        shell("echo -e '# Star mapping\nsample\tinput\tUniquelyMapped(Percent)\tMutipulMapped(Percent)' >> {output} ")
+        shell("cat {input.starMappingLogs}>> {output}")
+        shell("echo -e '# DNA contamination\nsample\tExon\tDNA\tIntron\tambiguous_RNA' >> {output} ")
+        shell("cat {input.statisticsLogs}>> {output}")
+
+
 
 ```
 
@@ -668,8 +1030,9 @@ Job counts:
         2       remove_rRNA
         4       samtools_index
         2       samtools_sort
+        2       bam2bigwig
         2       statistic_contamination
-        29
+        31
 This was a dry-run (flag -n). The order of jobs does not reflect the order of execution.
 
 ```
@@ -681,12 +1044,12 @@ $ snakemake -s riboseq-snakemake.py -j 8 ## 核数
 $ snakemake -s riboseq-snakemake.py -j 8 --rerun-incomplete
 ```
 
-+ 提交到计算节点运行
++ 提交到计算节点运行（LSF提交系统， bsub提交）
 
 ```
 ## 先开一个screen
 $ screen -S riboseq
-$ snakemake -s riboseq-snakemake.py --cluster "bsub -q TEST-A -n 4 -e err -o out" --jobs 29
+$ snakemake -s riboseq-snakemake.py --cluster "bsub -q TEST-A -n 4 -e err -o out" --jobs 31
 
 ##或者编写提交脚本
 $ vim riboseq_bsub.sh
@@ -703,12 +1066,21 @@ $ vim riboseq_bsub.sh
 #BSUB -n 4
 #BSUB -q TEST-A
 
-snakemake -s riboseq-snakemake.py --cluster "bsub -q TEST-A -o err -e out -n 4" --jobs 29
+snakemake -s riboseq-snakemake.py --cluster "bsub -q TEST-A -o err -e out -n 4" --jobs 31
 
 $ bsub < riboseq_bsub.sh
 ## 一般不会有问题，但是有些任务会因为不知名原因断掉，如fastqc那一步，这个可以在整个pipeline结束之后再通过以下运行一次，可以跑完
 
 $ snakemake -s riboseq-snakemake.py --cluster "bsub -q TEST-A -o err -e out -n 4" --jobs 10 #根据需要改写
+
+```
+
++ 提交到集群运行snakemake (slurm提交系统， sbatch提交）
+
+```
+## 先开一个screen
+$ screen -S a
+$ snakemake -s Ribo-seq-snakemake.py  --cluster "sbatch -p cmp -N 2 -n 8 -e Ribo.err -o Ribo.out " --jobs 61
 
 ```
 
