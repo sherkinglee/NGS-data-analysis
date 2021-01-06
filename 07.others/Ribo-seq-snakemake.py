@@ -3,7 +3,7 @@
 Author: Li Fajin
 Date: 2020-12-21 19:59:09
 LastEditors: Li Fajin
-LastEditTime: 2021-01-01 17:39:06
+LastEditTime: 2021-01-06 21:36:50
 Description: snakemake pipeline for ribo-seq data analyses, just for basic control steps such fastqc, cutadapt, qfiltering, mapping, samtools sort and index, 3nt periodicity checking, et al.
 '''
 
@@ -52,6 +52,8 @@ with os.popen("which bamCoverage") as path:
 
 
 ## snakemakes pipeline
+
+ruleorder:summary>mergeLogs
 
 rule all:
     input:

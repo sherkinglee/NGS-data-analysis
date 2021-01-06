@@ -127,6 +127,7 @@ pip install RiboMiner
 rule all这个规则只有一个*input*，里面只定义最后需要保存的文件或者目录，用户可以根据需要选择保留那些文件。
 
 ```
+ruleorder:summary>mergeLogs
 rule all:
     input:
         expand("01.beforeQC/{sample}",sample=SAMPLES),
@@ -737,7 +738,7 @@ with os.popen("which bamCoverage") as path:
 
 
 ## snakemakes pipeline
-
+ruleorder:summary>mergeLogs ## 如果不加这一个，整个流程运行下来会报错，因为会优先执行mergeLogs
 rule all:
     input:
         expand("01.beforeQC/{sample}",sample=SAMPLES),
