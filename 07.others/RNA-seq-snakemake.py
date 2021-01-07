@@ -3,7 +3,7 @@
 Author: Li Fajin
 Date: 2020-12-27 10:57:19
 LastEditors: Li Fajin
-LastEditTime: 2021-01-06 21:36:34
+LastEditTime: 2021-01-07 09:53:20
 Description: snakemake pipeline for RNA-seq data analyses, just for basic control steps such fastqc, cutadapt, qfiltering, mapping, samtools sort and index, read counting, et al.
 '''
 
@@ -54,7 +54,7 @@ with os.popen("which bamCoverage") as path:
 
 ## snakemakes pipeline
 
-ruleorder:summary>mergeLogs
+ruleorder:statistic_contamination>summary>mergeLogs
 
 rule all:
     input:
