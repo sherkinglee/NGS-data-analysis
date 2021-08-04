@@ -109,6 +109,41 @@ z<-Heatmap(as.matrix(data_selected),col = colorRamp2(c(-0.5,0,0.5), rev(colorRam
 ordered_data = data_selected[row_order(z),column_order(z)]
 ```
 
+#### **complexHeatmap进行分树cuttree**
+
+```
+library(dendextend)
+set.seed(12345)
+mat = as.matrix(polyA_raw_counts_common_FPKM_scaled)
+
+zz<-Heatmap(mat,col = colorRamp2(c(-2,0,2), rev(colorRampPalette(brewer.pal(5, "RdBu"))(3))),cluster_rows = T,cluster_columns = F,clustering_distance_columns = 'euclidean',clustering_method_columns ="ward.D2",heatmap_legend_param = list(title="z-score",legend_direction="vertical"),show_row_names = FALSE,top_annotation=polyA_annotation)
+zz <- draw(zz)
+
+r.dend <- row_dend(zz) ##  获取行分类树
+clusters <- cutree(r.dend,k=3) ## 切树分支
+
+zz_split<- Heatmap(mat, split = clusters,col = colorRamp2(c(-2,0,2), rev(colorRampPalette(brewer.pal(5, "RdBu"))(3))),cluster_rows = T,cluster_columns = F,heatmap_legend_param = list(title="z-score",legend_direction="vertical"),show_row_names = FALSE,top_annotation=polyA_annotation) ## 将clusters 传给split参数
+zz_split <- draw(zz_split)
+
+zz_split_ordered <- mat[unlist(row_order(zz_split)),column_order(zz_split)] ##获取聚类之后得数据矩阵
+zz_transID_clusters <- data.frame(transID=rownames(zz_split_ordered),clusters=rep(c(1,2,3),times=c(length(row_order(zz_split)[[1]]),length(row_order(zz_split)[[2]]),length(row_order(zz_split)[[3]])))) ## 获取分类之后的transcript id
+head(zz_transID_clusters)
+
+        transID clusters
+1 MSTRG.14332.1        1
+2 MSTRG.10400.1        1
+3 MSTRG.15268.1        1
+4 MSTRG.31983.4        1
+5 MSTRG.10888.2        1
+6 MSTRG.39847.1        1
+
+zz
+zz_split
+```
+
+![image_1fc7kd8b7mi21lq4tjpvt45ru9.png-192.4kB][5]
+
+
 ### **Python**
 
 ```
@@ -127,7 +162,7 @@ ax=sns.clustermap(data_selected,metric='euclidean',method='ward',row_cluster=Tru
 plt.subplots_adjust(left=0.08, bottom=0.205, right=0.835, top=0.93, wspace=0.2, hspace=0.2)
 plt.show()
 ```
-![image_1eev2fe5r1v3i47l135pm4mepa1t.png-318.8kB][5]
+![image_1eev2fe5r1v3i47l135pm4mepa1t.png-318.8kB][6]
 
 
 ### **Excel**
@@ -170,12 +205,13 @@ End Sub
 
 ```
 
-![image_1eev3pice1u4d1l541ga61c811k072a.png-73.9kB][6]
+![image_1eev3pice1u4d1l541ga61c811k072a.png-73.9kB][7]
 
 
   [1]: http://static.zybuluo.com/sherking/556isf74b45mspdao2gxve45/image_1eeuq48d8es016ik17n41i3c64c9.png
   [2]: http://static.zybuluo.com/sherking/651zgoywfm87px2qteaa8x55/image_1eeuq8o9s1ft1q611vd5vh515tdm.png
   [3]: http://static.zybuluo.com/sherking/g6pzrawzajp15252c4qc2spr/image_1eev0ue241e1t1usc1lq418mq1k7413.png
   [4]: http://static.zybuluo.com/sherking/7mf2a0cfek84anj1aai24dji/image_1eev1q1dj147omqa17ddrf01q0e1g.png
-  [5]: http://static.zybuluo.com/sherking/knhso7l0upl0e3hpcxw1gnzy/image_1eev2fe5r1v3i47l135pm4mepa1t.png
-  [6]: http://static.zybuluo.com/sherking/h6jpljundyajexh3w08zcpq8/image_1eev3pice1u4d1l541ga61c811k072a.png
+  [5]: http://static.zybuluo.com/sherking/r423zivnyojfomn3n920dz5g/image_1fc7kd8b7mi21lq4tjpvt45ru9.png
+  [6]: http://static.zybuluo.com/sherking/knhso7l0upl0e3hpcxw1gnzy/image_1eev2fe5r1v3i47l135pm4mepa1t.png
+  [7]: http://static.zybuluo.com/sherking/h6jpljundyajexh3w08zcpq8/image_1eev3pice1u4d1l541ga61c811k072a.png
