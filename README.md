@@ -72,6 +72,8 @@
 
 5）[热图:heatmap](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Heatmaps.md)
 
+6）[核型图](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/KayotypePlot.md)
+
 N）[将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analysis/blob/master/05.plots/Rplots2PPT.md)
 
 ---
