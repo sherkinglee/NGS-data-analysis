@@ -96,6 +96,8 @@ N）[将Rplots导出为PPT格式](https://github.com/sherkinglee/NGS-data-analys
 
 8）miRNA的预测和targets的预测等
 
+9）[MaxQuant分析pSILAC蛋白质组学数据](https://github.com/sherkinglee/NGS-data-analysis/tree/master/06.projects/MaxQuant-pSILAC.md)
+
 ---
 ### **[其他](https://github.com/sherkinglee/NGS-data-analysis/blob/master/07.others/)**
 
